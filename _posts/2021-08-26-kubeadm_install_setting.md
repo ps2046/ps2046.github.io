@@ -1,0 +1,138 @@
+---
+title:  "[kubernetes-실습] kubeadm 을 이용한 설치 및 세팅"
+excerpt: "kubernetes 인증 시험(CKA)에 대비하기 위해 실습을 해보도록 한다."
+
+categories:
+  - kubernetes
+tags:
+  - [kubernetes, cka, kubeadm]
+
+toc: true
+toc_sticky: true
+ 
+date: 2021-08-26
+last_modified_at: 2021-08-26
+---
+
+# 설치를 위한 준비 사항
+
+- kubeadm을 이용한 설치 기준
+- virtualbox 이용시   
+-- master : 3vCPU/4G memory/5G minimal OS   
+-- worker : 1vCPU/2G memory/5G minimal OS   
+- gcp, aws 이용시   
+-- spec : 2 vCPU/ 7.5G memory   
+-- putty 이용 할 경우 .pem or .ppk file 요구   
+- YAML 파일 작성시 유의 사항   
+-- TAB 사용 하면 안되고 white space로 사용
+
+# VM 기준 사전 세팅
+
+1. DHCP IP를 static으로 설정
+```bash
+# vi /etc/network/interfaces 
+auto ens33 
+iface ens33 inet static 
+address 172.20.0.150 
+netmask 255.255.255.0 
+broadcast 172.20.0.255 
+gateway 172.20.0.2 
+dns-nameservers 172.20.0.2 
+```
+
+2. Name resolution 설정 
+```bash
+# vi /etc/hosts에 등록 
+172.20.0.150 k8smaster 
+172.20.0.151 worker1 
+```
+
+3. swap disable 
+```bash
+cat /etc/fstab 
+```
+
+4. sudo 설정 
+```bash
+# vi /etc/sudoers
+  %sudo ALL=(ALL:ALL) NOPASSWD: ALL
+```
+
+# 쿠버네티스 클러스터 설치
+
+1. docker 설치 및 kubernetes repo 설정
+```bash
+root@k8smaster1:~# apt-get update && apt-get upgrade -y   
+# docker 설치 (참고, docker ce - edge:매월 업데이트, stable:3개월 마다 업데이트)   
+root@k8smaster1:~# apt-get install -y docker.io   
+# file 생성 후 main repo entry 추가   
+root@k8smaster1:~# vi /etc/apt/sources.list.d/kubernetes.list   
+deb http://apt.kubernetes.io/ kubernetes-xenial main   
+#package를 위해 GPG key를 추가   
+root@k8smaster1:~# curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -   
+# 새로운 repo 업데이트   
+root@k8smaster1:~# apt-get update
+```
+
+2. kube 관련 software 설치
+```bash
+root@k8smaster1:~# apt-get install -y kubeadm=1.15.1-00 kubelet=1.15.1-00 kubectl=1.15.1-00
+```
+
+
+3. calico network plugin 설치
+```bash
+# calico plugin 설치를 위한 yaml 파일 다운로드 
+# https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml 
+# https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml 
+root@k8smaster1:~# wget https://tinyurl.com/yb4xturm -O rbac-kdd.yaml 
+root@k8smaster1:~# wget https://tinyurl.com/y8lvqc9g -O calico.yaml 
+# 컨테이너에 할당된 IPV4 pool 
+# CALICO_IPV$POOL_CIDR 
+# 192.168.0.0./16 
+# 해당 설정 값은 kubeadm init 시 주어진 값과 match되어야 함. 
+root@k8smaster1:~# less calico.yaml 
+# primary interface IP 확인 
+# - ens4 inet 10.128.0.3/32 .... 
+root@k8smaster1:~# ip addr show
+```
+
+4. kubeadm 설정 및 초기화   
+kubeadm init 중 에러 발생시 다시 설정하고 싶은 경우 kubeadm reset 후에 다시 아래 대로 해주면 된다.
+```bash
+root@k8smaster1:~# vi kubeadm-config.yaml 
+apiVersion: kubeadm.k8s.io/v1beta2 
+kind: ClusterConfiguration 
+kubernetesVersion: 1.15.1 # <-- Use the word stable for newest version 
+controlPlaneEndpoint: "k8smaster:6443" # <-- hostname으로 아이피로 안하는 이유는 클러스터 구성 시 proxy를 사용하기 위해서
+networking: 
+  podSubnet: 192.168.0.0/16 # <-- podSubnet은 상단에 calico pool설정 값과 일치 해야 함 
+# --upload-certs => master, slave 인증서 
+# tee명령을 통해 output 로 남겨둠. 추후 worker node 추가시 사용 
+root@k8smaster1:~# kubeadm init --config=kubeadm-config.yaml --upload-certs | tee kubeadm-init.out
+```
+
+5. root 아닌 서브 계정으로 작업 하기 위해 서브계정에 권한 부여 (이후로는 서브 계정만 사용)
+```bash
+ps0107@k8smaster1:~$ mkdir -p $HOME/.kube 
+ps0107@k8smaster1:~$ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config 
+ps0107@k8smaster1:~$ sudo chown $(id -u):$(id -g) $HOME/.kube/config 
+ps0107@k8smaster1:~$ less $HOME/.kube/config
+```
+
+6. 자동 완성 기능 설정
+```bash
+ps0107@k8smaster1:~$ source <(kubectl completion bash) 
+ps0107@k8smaster1:~$ echo "source <(kubectl completion bash)" >> ~/.bashrc 
+ps0107@k8smaster1:~$ source ~/.bashrc
+```
+7. calico 및 rbac 적용
+```bash
+ps0107@k8smaster1:~$ sudo cp /root/rbac-add.yaml . 
+ps0107@k8smaster1:~$ sudo cp /root/calico.yaml . 
+ps0107@k8smaster1:~$ kubectl apply -f rbac-add.yaml 
+ps0107@k8smaster1:~$ kubectl apply -f calico.yaml 
+# kubeadm-config.yaml file에 포함된 내용 확인 가능 
+ps0107@k8smaster1:~$ sudo kubeadm config print init-defaults
+```
+
