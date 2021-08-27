@@ -1,6 +1,6 @@
 ---
 title:  "[kubernetes-실습] kubeadm 을 이용한 설치 및 세팅"
-excerpt: "kubernetes 인증 시험(CKA)에 대비하기 위해 실습을 해보도록 한다."
+excerpt: "kubernetes 인증 시험(CKA)에 대비하기 위해 실습을 해보도록 한다. "
 
 categories:
   - kubernetes
