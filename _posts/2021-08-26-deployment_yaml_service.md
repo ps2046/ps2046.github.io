@@ -1,0 +1,381 @@
+---
+title:  "[kubernetes-실습] 쿠버네티스 클러스트 노드 확장 및 셋팅"
+excerpt: "kubernetes 인증 시험(CKA)에 대비하기 위해 실습을 해보도록 한다. "
+
+categories:
+  - kubernetes
+tags:
+  - [kubernetes, cka, kubernetes node]
+
+toc: true
+toc_sticky: true
+ 
+date: 2021-08-26
+last_modified_at: 2021-08-26
+---
+
+# nginx app 간단하게 배포해보기
+```bash
+# nginx app 배포 하기
+ps0107@k8smaster1:~$ kubectl create deployment nginx --image=nginx  
+deployment.apps/nginx created
+
+# 현재 클러스터의 event 확인
+ps0107@k8smaster1:~$ kubectl get events
+LAST SEEN   TYPE     REASON              OBJECT                        MESSAGE
+29s         Normal   Scheduled           pod/nginx-554b9c67f9-cncvz    Successfully assigned default/nginx-554b9c67f9-cncvz to k8sworker1
+27s         Normal   Pulling             pod/nginx-554b9c67f9-cncvz    Pulling image "nginx"
+21s         Normal   Pulled              pod/nginx-554b9c67f9-cncvz    Successfully pulled image "nginx"
+20s         Normal   Created             pod/nginx-554b9c67f9-cncvz    Created container nginx
+19s         Normal   Started             pod/nginx-554b9c67f9-cncvz    Started container nginx
+29s         Normal   SuccessfulCreate    replicaset/nginx-554b9c67f9   Created pod: nginx-554b9c67f9-cncvz
+29s         Normal   ScalingReplicaSet   deployment/nginx              Scaled up replica set nginx-554b9c67f9 to 1
+
+# nginx object의 자세한 정보를 확인
+ps0107@k8smaster1:~$ kubectl describe deployment nginx
+Name:                   nginx
+Namespace:              default
+CreationTimestamp:      Tue, 28 Jan 2020 10:10:43 +0000
+Labels:                 app=nginx
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=nginx
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=nginx
+  Containers:
+   nginx:
+    Image:        nginx
+    Port:         <none>
+    Host Port:    <none>
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   nginx-554b9c67f9 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  71s   deployment-controller  Scaled up replica set nginx-554b9c67f9 to 1
+```
+
+# yaml 파일 템플릿 만드는 3가지 방법
+
+|명령어|리소스 생성|설명|   
+|$ kubectl get deployment nginx -o yaml	|필요	|템플릿 내용 중에서 아래 라인 삭제하여 사용 </br> -- createTimestamp </br> -- resourceVersion </br> -- selfLink </br> -- uid </br> -- status 포함 아래 전체|   
+|$ kubectl get deployment nginx --export	|필요	|템플릿 내용 그대로 사용 가능. 필요한 부분만 수정해서 사용.|   
+|$ kubectl create deployment nginx --dry-run	|필요없음	|실제 object를 생성하지 않고 yaml 파일 템플릿을 얻을 수 있음.|   
+
+```bash
+# -o 옵션을  nginx object의 정보를 yaml 형태로 볼수 있다
+ps0107@k8smaster1:~$ kubectl get deployment nginx -o yaml 
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2020-01-28T10:10:43Z"
+  generation: 1
+  labels:
+    app: nginx
+  name: nginx
+  namespace: default
+  resourceVersion: "8641"
+  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/nginx
+  uid: 7de7b7fa-7897-45e8-af80-7fa18af75220
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: nginx
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx
+        imagePullPolicy: Always
+        name: nginx
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2020-01-28T10:10:53Z"
+    lastUpdateTime: "2020-01-28T10:10:53Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2020-01-28T10:10:43Z"
+    lastUpdateTime: "2020-01-28T10:10:53Z"
+    message: ReplicaSet "nginx-554b9c67f9" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+  
+# --dry-run 옵션을 사용하면 현재 object resource 가 없더라도 템플릿을 얻을수 있다.
+ps0107@k8smaster1:~$ kubectl create deployment two --image=nginx --dry-run -o yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: two
+  name: two
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: two
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: two
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}
+status: {}
+
+# --export 옵션을 사용하여 현재 nginx 객체에서 필요없는 부분이 삭제 되어 템플릿을 보여준다.
+ps0107@k8smaster1:~$ kubectl get deployments nginx --export -o yaml
+Flag --export has been deprecated, This flag is deprecated and will be removed in future.
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: null
+  generation: 1
+  labels:
+    app: nginx
+  name: nginx
+  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/nginx
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: nginx
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx
+        imagePullPolicy: Always
+        name: nginx
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status: {}
+```
+
+# nginx app 서비스 expose 해보기
+
+- 참고로 nginx expose 후 ifconfig로 인터페이스를 보면 calico 인터페이스가 두개 생성이 되는것을 볼수 있다.
+
+```bash
+# nginx 서비스 expose를 시도했으나 컨테이너 포트 미지정으로 에러 발생.
+ps0107@k8smaster1:~$ kubectl expose deployment/nginx 
+error: could not find port via --port flag or introspection
+See kubectl expose -h for help and examples
+
+# -o 옵션으로 현재 nginx 리소스의 템플릿 파일 만듬.
+ps0107@k8smaster1:~$ kubectl get deployment nginx -o yaml > nginx_1.yaml
+
+# 만들어진 템플릿 파일에 필요 없는 부분 삭제하 아래와 같이 container port 부분 추가
+ps0107@k8smaster1:~$ vi nginx_1.yaml
+....
+   spec:
+      containers:
+      - image: nginx
+        imagePullPolicy: Always
+        name: nginx
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources: {}
+....
+
+# 수정된 yaml 파일로 nginx update
+# replace 옵션: 해당 yaml 파일에 내용으로 전체 update, 새로운 deployment를 생성하고 기존 것을 terminate 시킴
+ps0107@k8smaster1:~$ kubectl replace -f nginx_1.yaml 
+deployment.extensions/nginx replaced
+
+# AGE 부분 보면 새로 생성된거 확인이 가능하다.
+ps0107@k8smaster1:~$ kubectl get deployment,pod
+NAME                          READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.extensions/nginx   1/1     1            1           49m
+
+NAME                         READY   STATUS    RESTARTS   AGE
+pod/nginx-7bffc778db-6bhr6   1/1     Running   0          2m9s
+
+# 다시 서비스 expose 해본다. 이번에 정상적으로 됐다.
+ps0107@k8smaster1:~$ kubectl expose deployment/nginx
+service/nginx exposed
+
+# nginx svc 조회
+ps0107@k8smaster1:~$ kubectl get svc nginx
+NAME    TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+nginx   ClusterIP   10.97.139.18   <none>        80/TCP    13s
+
+# nginx endpoint 조회 (endpoint는 pod ip + container port)
+ps0107@k8smaster1:~$ kubectl get ep nginx
+NAME    ENDPOINTS        AGE
+nginx   192.168.1.3:80   25s
+
+# nginx cluster ip로 curl 테스트
+ps0107@k8smaster1:~$ curl 10.97.139.18:80
+Welcome to nginx!
+
+# nginx endpoint 로 curl 테스트
+ps0107@k8smaster1:~$ curl 192.168.1.3:80
+Welcome to nginx!
+```
+
+# nginx web server를 scale out 해보기
+
+```bash
+# replicas를 3으로 조정
+ps0107@k8smaster1:~$ kubectl scale deployment nginx --replicas=3
+deployment.extensions/nginx scaled
+
+# 3개의 pod가 생성된것을 확인할 수 있다.
+ps0107@k8smaster1:~$ kubectl get deployment nginx         
+NAME    READY   UP-TO-DATE   AVAILABLE   AGE
+nginx   3/3     3            3           15h
+
+# endpoint도 pod 갯수대로 생성이 되었다.
+ps0107@k8smaster1:~$ kubectl get ep nginx        
+NAME    ENDPOINTS                                       AGE
+nginx   192.168.0.10:80,192.168.1.3:80,192.168.1.4:80   14h
+
+# 3개의 pod정보를 확인할 수 있다.
+ps0107@k8smaster1:~$ kubectl get po -o wide
+NAME                     READY   STATUS    RESTARTS   AGE   IP             NODE         NOMINATED NODE   READINESS GATES
+nginx-7bffc778db-4zbb2   1/1     Running   0          42s   192.168.1.4    k8sworker1   <none>           <none>
+nginx-7bffc778db-6bhr6   1/1     Running   0          14h   192.168.1.3    k8sworker1   <none>           <none>
+nginx-7bffc778db-zvlft   1/1     Running   0          42s   192.168.0.10   k8smaster1   <none>           <none>
+
+# 예전에 생성된거 1개 제외하고 2개가 추가로 생성되었다. 예전에 생성된 pod를 삭제해 보자.
+ps0107@k8smaster1:~$ kubectl delete po nginx-7bffc778db-6bhr6 
+pod "nginx-7bffc778db-6bhr6" deleted
+
+# pod가 새로 생성이 되었다.
+ps0107@k8smaster1:~$ kubectl get po -o wide                   
+NAME                     READY   STATUS    RESTARTS   AGE     IP             NODE         NOMINATED NODE   READINESS GATES
+nginx-7bffc778db-4zbb2   1/1     Running   0          2m45s   192.168.1.4    k8sworker1   <none>           <none>
+nginx-7bffc778db-svxw2   1/1     Running   0          29s     192.168.1.5    k8sworker1   <none>           <none>
+nginx-7bffc778db-zvlft   1/1     Running   0          2m45s   192.168.0.10   k8smaster1   <none>           <none>
+
+# endpoint도 새로 생성된걸 확인 할 수있다.
+ps0107@k8smaster1:~$ kubectl get ep nginx 
+NAME    ENDPOINTS                                       AGE
+nginx   192.168.0.10:80,192.168.1.4:80,192.168.1.5:80   14h
+
+# cluster ip로 curl 테스트 해보면 3개의 pod로 분산되어 들어간다.
+```
+
+
+# 클러스터 외부에서 접근할 수 있도록 설정해보기
+
+```bash
+# 현재 pod 정보
+ps0107@k8smaster1:~$ kubectl get po
+NAME                     READY   STATUS    RESTARTS   AGE
+nginx-7bffc778db-4zbb2   1/1     Running   0          37m
+nginx-7bffc778db-svxw2   1/1     Running   0          35m
+nginx-7bffc778db-zvlft   1/1     Running   0          37m
+
+# pod 안에 환경설정 정보를 확인해본다 (KUBERNETES란 네이밍이 들어간 것만)
+ps0107@k8smaster1:~$ kubectl exec nginx-7bffc778db-4zbb2 -- printenv | grep KUBERNETES
+KUBERNETES_PORT_443_TCP_ADDR=10.96.0.1   
+KUBERNETES_PORT_443_TCP_PORT=443     
+KUBERNETES_SERVICE_HOST=10.96.0.1   
+KUBERNETES_SERVICE_PORT_HTTPS=443   
+KUBERNETES_PORT_443_TCP=tcp://10.96.0.1:443   
+KUBERNETES_PORT=tcp://10.96.0.1:443          
+KUBERNETES_SERVICE_PORT=443       
+KUBERNETES_PORT_443_TCP_PROTO=tcp       
+
+# 현재 svc 정보 확인
+ps0107@k8smaster1:~$ kubectl get svc
+NAME         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+kubernetes   ClusterIP   10.96.0.1      <none>        443/TCP   17h
+nginx        ClusterIP   10.97.139.18   <none>        80/TCP    14h
+
+# nginx svc 리소스를 삭제 해준다. 다시 생성하기 위해서.
+ps0107@k8smaster1:~$ kubectl delete svc nginx 
+service "nginx" deleted
+
+# 이번엔 LoadBalancer 타입으로 생성해준다.
+ps0107@k8smaster1:~$ kubectl expose deployment nginx --type=LoadBalancer 
+service/nginx exposed
+
+# 생성된 것을 확인할 수 있다. 
+# 참고로 external-ip는 eks 같은 클라우드 서비스를 쓸 경우 elb 주소가 들어간다.
+# 현재는 없으므로 pending 상태이다. 대신 node port 하나가 생성되었다 (31325 port)
+ps0107@k8smaster1:~$ kubectl get svc
+NAME         TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+kubernetes   ClusterIP      10.96.0.1        <none>        443/TCP        17h
+nginx        LoadBalancer   10.103.105.106   <pending>     80:31325/TCP   8s
+```
+
+- 웹브라우저를 통해서 http://{노드아이피}:{노드포트} 로 접속하면 nginx 화면을 볼수 있다. 3개의 pod로 분산되어 들어가게 된다. 
+replicas를 0으로 해서 다시 접속하면 웹접속은 실패할 것이다.
+실습 후 이제 리소스를 정리해본다. 상위 객체 삭제시 하위객체까지 삭제되고, 하위 객체 삭제시 상위객체는 남아 있게 된다.
+
+```bash
+ps0107@k8smaster1:~$ kubectl delete deployments nginx 
+deployment.extensions "nginx" deleted
+
+ps0107@k8smaster1:~$ kubectl delete ep nginx  
+endpoints "nginx" deleted
+
+ps0107@k8smaster1:~$ kubectl delete svc nginx 
+service "nginx" deleted
+```

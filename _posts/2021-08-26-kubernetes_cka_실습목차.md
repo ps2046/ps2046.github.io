@@ -17,8 +17,8 @@ last_modified_at: 2021-08-26
 LFS458 관련 대비 실습 - 하나씩 해보자!
 
 01. [kubeadm 을 이용한 설치 및 세팅](../kubeadm_install_setting)
-02. kubernetes 클러스터 노드 확장 및 셋팅
-03. 간단한 application 배포, yaml템플릿, 서비스 expose 해보기
+02. [kubernetes 클러스터 노드 확장 및 셋팅](../kubernetes_cluster_node_setting)
+03. [간단한 application 배포, yaml템플릿, 서비스 expose 해보기](../deployment_yaml_service)
 04. deployment 의 CPU, Memory 제약
 05. namespace 를 위한 resource limit 설정
 06. 좀더 복잡한 deployment 배포해보기

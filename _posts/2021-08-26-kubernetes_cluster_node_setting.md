@@ -1,0 +1,163 @@
+---
+title:  "[kubernetes-실습] 쿠버네티스 클러스트 노드 확장 및 셋팅"
+excerpt: "kubernetes 인증 시험(CKA)에 대비하기 위해 실습을 해보도록 한다. "
+
+categories:
+  - kubernetes
+tags:
+  - [kubernetes, cka, kubernetes node]
+
+toc: true
+toc_sticky: true
+ 
+date: 2021-08-26
+last_modified_at: 2021-08-26
+---
+
+# 클러스터에 추가할 노드 세팅
+- master 세팅과 마찬가지로 기본적인 설치 진행
+- /etc/hosts 파일 설정 필요. [kubeadm 을 이용한 설치 및 세팅](../kubeadm_install_setting) 참조
+
+```bash
+root@k8sworker1:~# apt-get update && apt-get upgrade -y
+
+# docker 설치 (참고, docker ce - edge:매월 업데이트, stable:3개월 마다 업데이트)
+root@k8sworker1:~# apt-get install -y docker.io
+
+# file 생성 후 main repo entry 추가
+root@k8sworker1:~# vi /etc/apt/sources.list.d/kubernetes.list
+deb http://apt.kubernetes.io/ kubernetes-xenial main
+
+#package를 위해 GPG key를 추가
+root@k8sworker1:~# curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+
+# 새로운 repo 업데이트
+root@k8sworker1:~# apt-get update
+
+# kubeadm 설치
+root@k8sworker1:~# apt-get install -y kubeadm=1.15.1-00 kubelet=1.15.1-00 kubectl=1.15.1-00
+```
+
+# master token 생성 및 확인
+- join 할때 사용할 토큰으로 기본적으로 24시간의 TTL이 걸려 있음. 만료시 token 다시 생성 필요
+
+```bash
+  sudo kubeadm token create
+```
+
+```bash
+# master node ip 확인
+ps0107@k8smaster1:~$ ip addr show ens4 | grep inewkt
+  inet 10.146.0.2/32 brd 10.146.0.2 scope global ens4
+  inet6 fe80::4001:aff:fe92:2/64 scope link
+
+# join을 위한 master token 생성 (생성된게 없거나 만료되었을 경우 새로 생성)
+ps0107@k8smaster1:~$ sudo kubeadm token create
+jaeaqt.rumpgep17nqunhgl
+
+# master token list 확인
+ps0107@k8smaster1:~$ sudo kubeadm token list                                                                                              
+TOKEN                     TTL       EXPIRES                USAGES                   DESCRIPTION                                           EXTRA GROUPS
+jaeaqt.rumpgep17nqunhgl   23h       2020-01-29T08:29:33Z   authentication,signing   <none>                                                system:bootstrappers:kubeadm:default-node-token
+
+# join시 보안을 위해 Discovery Token CA Cert Hash를 사용.
+# 해당 명령 수행 결과 나오는 output 사용
+ps0107@k8smaster1:~$ openssl x509 -pubkey \
+-in /etc/kubernetes/pki/ca.crt | openssl rsa \
+-pubin -outform der 2>/dev/null | openssl dgst \
+-sha256 -hex | sed 's/^.* //'
+16e1304347fa2f5cb6f1660e582ed3501aa63e0ddce276773566098aef13d0ba
+```
+
+
+# 추가할 노드에서 join 수행
+```bash
+# /etc/hosts 파일에 master 정보 추가
+root@k8sworker1:~# vi /etc/hosts
+10.146.0.2  k8smaster  master
+
+# node join 
+# master 노드에서 받은 token 및 cert 정보 참고
+# kubeadm join --token {master token} k8smaster:6443 \
+# --discovery-token-ca-cert-hash \
+# sha256:{discovery toekn ca cert hash}
+root@k8sworker1:~# kubeadm join --token 3jaeaqt.rumpgep17nqunhgl k8smaster:6443 \
+--discovery-token-ca-cert-hash \
+sha256:16e1304347fa2f5cb6f1660e582ed3501aa63e0ddce276773566098aef13d0ba
+[preflight] Running pre-flight checks
+[WARNING IsDockerSystemdCheck]: detected "cgroupfs" as the Docker cgroup driver. The recommended driver is "systemd". Please follow the guide at https://kubernetes.io/docs/setup/cri/
+[preflight] Reading configuration from the cluster...
+[preflight] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -oyaml'
+[kubelet-start] Downloading configuration for the kubelet from the "kubelet-config-1.15" ConfigMap in the kube-system namespace
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[kubelet-start] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"
+[kubelet-start] Activating the kubelet service
+[kubelet-start] Waiting for the kubelet to perform the TLS Bootstrap...
+
+This node has joined the cluster:
+* Certificate signing request was sent to apiserver and a response was received.
+* The Kubelet was informed of the new secure connection details.
+
+Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
+```
+
+# 클러스터 확장 확인 및 마무리
+- 추가된 노드 확인
+
+```bash
+# 추가된 노드 확인
+ps0107@k8smaster1:~$ kubectl get node
+NAME         STATUS   ROLES    AGE     VERSION
+k8smaster1   Ready    master   14m     v1.15.1
+k8sworker1   Ready    <none>   7m37s   v1.15.1
+
+# 노드의 상세 정보 확인
+ps0107@k8smaster1:~$ kubectl describe node k8sworker1
+Name:               k8sworker1
+Roles:              <none>
+Labels:             beta.kubernetes.io/arch=amd64
+                    beta.kubernetes.io/os=linux
+                    kubernetes.io/arch=amd64
+                    kubernetes.io/hostname=k8sworker1
+                    kubernetes.io/os=linux
+Annotations:        kubeadm.alpha.kubernetes.io/cri-socket: /var/run/dockershim.sock
+                    node.alpha.kubernetes.io/ttl: 0
+                    projectcalico.org/IPv4Address: 10.146.0.4/32
+                    volumes.kubernetes.io/controller-managed-attach-detach: true
+......
+```
+ 
+
+- 현재 마스터 노드는 noschedule 상태로 사용자의 pod를 생성하지 않는다. 연습용 클러스터에서는 마스터 노드에서도 pod를 생성하도록 바꿔보도록 한다.
+
+```bash
+# 해당 설정은 master에서 서비스용 pod가 생성되지 않도록 설정되어 있음. (noschedule 상태)
+ps0107@k8smaster1:~$ kubectl describe node | grep -i taint
+Taints:             node-role.kubernetes.io/master:NoSchedule
+Taints:             <none>
+
+# master의 taint 해제
+ps0107@k8smaster1:~$ kubectl taint nodes --all node-role.kubernetes.io/master-
+node/k8smaster1 untainted
+error: taint "node-role.kubernetes.io/master:" not found # -> worker node에는 master가 없으니 에러
+ps0107@k8smaster1:~$ kubectl describe node | grep -i taint
+Taints:             <none>
+Taints:             <none>
+
+# 혹시 worker node가 not-ready 상태라면 taint 해제해주면 됨.
+ps0107@k8smaster1:~$ kubectl taint nodes --all node-role.kubernetes.io/not-ready-
+
+# namsspace 에 대한 상태 확인. 혹시 정상적이지 않은 경우 delete 처리 해준다.
+ps0107@k8smaster1:~$ kubectl get pods --all-namespaces
+NAMESPACE     NAME                                 READY   STATUS    RESTARTS   AGE
+kube-system   calico-node-wvxxm                    2/2     Running   0          31m
+kube-system   calico-node-zxkxk                    2/2     Running   0          28m
+kube-system   coredns-5c98db65d4-97gng             1/1     Running   0          35m
+kube-system   coredns-5c98db65d4-fvz2k             1/1     Running   0          35m
+kube-system   etcd-k8smaster1                      1/1     Running   0          34m
+kube-system   kube-apiserver-k8smaster1            1/1     Running   0          34m
+kube-system   kube-controller-manager-k8smaster1   1/1     Running   0          34m
+kube-system   kube-proxy-t62q4                     1/1     Running   0          35m
+kube-system   kube-proxy-tnmtr                     1/1     Running   0          28m
+kube-system   kube-scheduler-k8smaster1            1/1     Running   0          34m
+```
