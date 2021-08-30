@@ -67,7 +67,7 @@ h2 {
   @extend %section;
   @extend %anchor;
 
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 }
 
 h3 {
@@ -75,7 +75,7 @@ h3 {
   @extend %section;
   @extend %anchor;
 
-  font-size: 1.35rem;
+  font-size: 1rem;
 }
 
 h4 {
@@ -83,7 +83,7 @@ h4 {
   @extend %section;
   @extend %anchor;
 
-  font-size: 1.45rem;
+  font-size: 0.7rem;
 }
 
 h5 {
@@ -91,7 +91,7 @@ h5 {
   @extend %section;
   @extend %anchor;
 
-  font-size: 1.2rem;
+  font-size: 0.5rem;
 }
 
 ol,
@@ -964,8 +964,9 @@ $sidebar-display: "sidebar-display";
     @extend %no-bottom-border;
     @extend %heading;
 
-    font-size: 1.4rem;
-    line-height: 2.5rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    line-height: 2.0rem;
   }
 
   > div {
@@ -978,7 +979,7 @@ $sidebar-display: "sidebar-display";
     i { // icons
       color: #818182;
       margin-right: 0.15rem;
-      font-size: 80%;
+      font-size: 60%;
     }
 
     > p {
