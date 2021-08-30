@@ -66,8 +66,10 @@ div > pre {
 
   pre {
     margin-bottom: 0;
-    font-size: $code-font-size;
-    line-height: 1.4rem;
+    font-size: 0.8rem;
+    //font-size: $code-font-size;
+    font-family: 'd2coding';
+    line-height: 1.2rem;
     word-wrap: normal; /* Fixed Safari overflow-x */
   }
 

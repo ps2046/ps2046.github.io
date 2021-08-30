@@ -11,7 +11,7 @@
 #page-tag {
   ul > li {
     line-height: 1.5rem;
-    padding: 0.6rem 0;
+    padding: 0.1rem 0;
 
     &::before { // dot
       background: #999;
@@ -28,7 +28,7 @@
     > a { /* post's title */
       @extend %no-bottom-border;
 
-      font-size: 1.1rem;
+      font-size: 0.9rem;
     }
 
     > span:last-child {

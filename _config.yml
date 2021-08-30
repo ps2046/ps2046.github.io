@@ -18,7 +18,7 @@ timezone: Asia/Seoul
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: "ps's docLog"                          # the main title
+title: "ps's devlog"                          # the main title
 
 tagline: System Engineer & Developer   # it will display as the sub-title
 
@@ -43,7 +43,7 @@ social:
   email: ps2046.jang@gmail.com             # change to your email address
   links:
     # The first element serves as the copyright owner's link
-    - https://psnote.tistory.com      # change to your twitter homepage
+    - https://ps2046.github.io      # change to your twitter homepage
     - https://github.com/ps2046       # change to your github homepage
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
@@ -89,7 +89,7 @@ toc: true
 
 disqus:
   comments: true  # boolean type, the global switch for posts comments.
-  shortname: 'ps2046.github.io'    # Fill with your Disqus shortname. › https://help.disqus.com/en/articles/1717111-what-s-a-shortname
+  shortname: 'ps2046-github-io'    # Fill with your Disqus shortname. › https://help.disqus.com/en/articles/1717111-what-s-a-shortname
 
 paginate: 10
 
