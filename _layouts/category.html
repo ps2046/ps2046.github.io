@@ -14,8 +14,8 @@ layout: page
 
   <ul class="post-content pl-0">
     {% assign post_df = site.data.locales[lang].date_format.post.long %}
-
-    {% for post in page.posts %}
+    {% assign sort_posts = page.posts | sort %}
+    {% for post in sort_posts %}
     <li class="d-flex justify-content-between pl-md-3 pr-md-3">
       <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
       <span class="dash flex-grow-1"></span>
