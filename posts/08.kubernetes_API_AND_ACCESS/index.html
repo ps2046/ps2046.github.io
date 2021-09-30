@@ -1,0 +1,1757 @@
+<!DOCTYPE html><html lang="en" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="day-prompt" content="days ago"><meta name="hour-prompt" content="hours ago"><meta name="minute-prompt" content="minutes ago"><meta name="justnow-prompt" content="just now"><meta name="generator" content="Jekyll v4.2.0" /><meta property="og:title" content="[kubernetes-실습] API AND ACCESS" /><meta property="og:locale" content="en" /><meta name="description" content="kubernetes 인증 시험(CKA)에 대비하기 위해 실습을 해보도록 한다." /><meta property="og:description" content="kubernetes 인증 시험(CKA)에 대비하기 위해 실습을 해보도록 한다." /><link rel="canonical" href="https://ps2046.github.io/posts/08.kubernetes_API_AND_ACCESS/" /><meta property="og:url" content="https://ps2046.github.io/posts/08.kubernetes_API_AND_ACCESS/" /><meta property="og:site_name" content="ps’s Blog" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2021-01-26T04:00:00+09:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="[kubernetes-실습] API AND ACCESS" /><meta name="twitter:site" content="@ps2046" /><meta name="google-site-verification" content="google_meta_tag_verification" /> <script type="application/ld+json"> {"description":"kubernetes 인증 시험(CKA)에 대비하기 위해 실습을 해보도록 한다.","headline":"[kubernetes-실습] API AND ACCESS","dateModified":"2021-08-26T00:00:00+09:00","url":"https://ps2046.github.io/posts/08.kubernetes_API_AND_ACCESS/","datePublished":"2021-01-26T04:00:00+09:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://ps2046.github.io/posts/08.kubernetes_API_AND_ACCESS/"},"@context":"https://schema.org"}</script><title>[kubernetes-실습] API AND ACCESS | ps's Blog</title><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="ps's Blog"><meta name="application-name" content="ps's Blog"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://fonts.gstatic.com"><link rel="preconnect" href="https://www.google-analytics.com" crossorigin="use-credentials"><link rel="dns-prefetch" href="https://www.google-analytics.com"><link rel="preconnect" href="https://www.googletagmanager.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://www.googletagmanager.com"><link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css"><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1.1.0/dist/magnific-popup.min.css"> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script> <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7635228999568716" crossorigin="anonymous"></script><body data-spy="scroll" data-target="#toc"><div id="sidebar" class="d-flex flex-column align-items-end" lang="en"><div class="profile-wrapper text-center"><div id="avatar"> <a href="/" alt="avatar" class="mx-auto"> <img src="https://avatars.githubusercontent.com/u/11029548?s=400&u=5ebc191faa53e931968ec2ed98bd7c7b68136c71&v=4" alt="avatar" onerror="this.style.display='none'"> </a></div><div class="site-title mt-3"> <a href="/">ps's Blog</a></div><div class="site-subtitle font-italic">System Engineer & Developer</div></div><ul class="w-100"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>HOME</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream ml-xl-3 mr-xl-3 unloaded"></i> <span>CATEGORIES</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tags ml-xl-3 mr-xl-3 unloaded"></i> <span>TAGS</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>ARCHIVES</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info ml-xl-3 mr-xl-3 unloaded"></i> <span>ABOUT</span> </a></ul><div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center"> <a href="https://github.com/ps2046" aria-label="github" class="order-3" target="_blank" rel="noopener"> <i class="fab fa-github-alt"></i> </a> <a href="https://twitter.com/ps2046" aria-label="twitter" class="order-4" target="_blank" rel="noopener"> <i class="fab fa-twitter"></i> </a> <a href=" javascript:location.href = 'mailto:' + ['ps2046.jang','gmail.com'].join('@')" aria-label="email" class="order-5" > <i class="fas fa-envelope"></i> </a> <a href="/feed.xml" aria-label="rss" class="order-6" > <i class="fas fa-rss"></i> </a> <span class="icon-border order-2"></span> <span id="mode-toggle-wrapper" class="order-1"> <i class="mode-toggle fas fa-adjust"></i> <script type="text/javascript"> class ModeToggle { static get MODE_KEY() { return "mode"; } static get DARK_MODE() { return "dark"; } static get LIGHT_MODE() { return "light"; } constructor() { if (this.hasMode) { if (this.isDarkMode) { if (!this.isSysDarkPrefer) { this.setDark(); } } else { if (this.isSysDarkPrefer) { this.setLight(); } } } var self = this; /* always follow the system prefers */ this.sysDarkPrefers.addListener(function() { if (self.hasMode) { if (self.isDarkMode) { if (!self.isSysDarkPrefer) { self.setDark(); } } else { if (self.isSysDarkPrefer) { self.setLight(); } } self.clearMode(); } self.updateMermaid(); }); } /* constructor() */ setDark() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); } setLight() { $('html').attr(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); } clearMode() { $('html').removeAttr(ModeToggle.MODE_KEY); sessionStorage.removeItem(ModeToggle.MODE_KEY); } get sysDarkPrefers() { return window.matchMedia("(prefers-color-scheme: dark)"); } get isSysDarkPrefer() { return this.sysDarkPrefers.matches; } get isDarkMode() { return this.mode == ModeToggle.DARK_MODE; } get isLightMode() { return this.mode == ModeToggle.LIGHT_MODE; } get hasMode() { return this.mode != null; } get mode() { return sessionStorage.getItem(ModeToggle.MODE_KEY); } /* get the current mode on screen */ get modeStatus() { if (this.isDarkMode || (!this.hasMode && this.isSysDarkPrefer) ) { return ModeToggle.DARK_MODE; } else { return ModeToggle.LIGHT_MODE; } } updateMermaid() { if (typeof mermaid !== "undefined") { let expectedTheme = (this.modeStatus === ModeToggle.DARK_MODE? "dark" : "default"); let config = { theme: expectedTheme }; /* re-render the SVG › <https://github.com/mermaid-js/mermaid/issues/311#issuecomment-332557344> */ $(".mermaid").each(function() { let svgCode = $(this).prev().children().html(); $(this).removeAttr("data-processed"); $(this).html(svgCode); }); mermaid.initialize(config); mermaid.init(undefined, ".mermaid"); } } flipMode() { if (this.hasMode) { if (this.isSysDarkPrefer) { if (this.isLightMode) { this.clearMode(); } else { this.setLight(); } } else { if (this.isDarkMode) { this.clearMode(); } else { this.setDark(); } } } else { if (this.isSysDarkPrefer) { this.setLight(); } else { this.setDark(); } } this.updateMermaid(); } /* flipMode() */ } /* ModeToggle */ let toggle = new ModeToggle(); $(".mode-toggle").click(function() { toggle.flipMode(); }); </script> </span></div></div><div id="topbar-wrapper" class="row justify-content-center topbar-down"><div id="topbar" class="col-11 d-flex h-100 align-items-center justify-content-between"> <span id="breadcrumb"> <span> <a href="/"> Home </a> </span> <span>[kubernetes-실습] API AND ACCESS</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> Post</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="Search..."> <i class="fa fa-times-circle fa-fw" id="search-cleaner"></i> </span> <span id="search-cancel" >Cancel</span></div></div><div id="main-wrapper"><div id="main"><div class="row"><div id="post-wrapper" class="col-12 col-lg-11 col-xl-8"><div class="post pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><h1 data-toc-skip>[kubernetes-실습] API AND ACCESS</h1><div class="post-meta text-muted d-flex flex-column"><div> <span class="semi-bold"> ps.jang </span> on <span class="timeago " data-toggle="tooltip" data-placement="bottom" title="Tue, Jan 26, 2021, 4:00 AM +0900" >Jan 26<i class="unloaded">2021-01-26T04:00:00+09:00</i> </span></div><div> <span> Updated <span class="timeago lastmod" data-toggle="tooltip" data-placement="bottom" title="Thu, Aug 26, 2021, 12:00 AM +0000" >Aug 26<i class="unloaded">2021-08-26T00:00:00+09:00</i> </span> </span> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="2620 words">14 min read</span></div></div><div class="post-content"><h2 id="tls-access-설정-인증서-기반의-클러스터-api">TLS Access 설정 (인증서 기반의 클러스터 API)</h2><ul><li><p>api를 통해 직접 호출 할수 있도록 3가지 key를 필요로 한다.</p><li><p>~/.kube/config 경로 안에 있는 아래 3가지 키를 base64로 encording 한 후 각각의 파일로 저장 하여 사용한다.</p><ul><li>certificate-authority-data<li>client-certificate-data<li>client-key-data</ul></ul><div lang="bash" class="language-bash highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+</pre><td class="rouge-code"><pre><span class="c"># ~/.kube/config 안에 정보를 확인</span>
+ps0107@k8smaster1:~<span class="nv">$ </span><span class="nb">cat</span> ~/.kube/config
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: <span class="nv">LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJd01ERXlPREE0TWprd09Wb1hEVE13TURFeU5UQTRNamt3T1Zvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTk9XCjZMdDkweTMvZDU2VEdIZFFWR25hZGtScXhPUERPYmplOVpUTkVIU3JWZUU3NWpPQ1A0RWdaTFVxcjBBWm5mSTIKQ0hSU3ZGdkdUT2Qza0o0bnRMS0RrT21VaWV4N2s0ZnRJM0lNc0RraDM4OTMzaGxMRDBBTzZzR3cvUnZpaVJ2Swo1N0RLVjRBaXFTTkRabXlpRFJHRFAvc3o1NllzTEdhQXJTUzVwcFYrQ2NKanhHeXV2UXNKZmZEekJsZ2FCakRoCmlWcDhrdTBNVUpFRktLbDNTNnhLZXRZRTRwZVpNcmlGZUpBb0pVZTZscmpYRWplVVN1a29FdmxmbGJIMGhWL3IKWk1ydkwwaGRKeWdIQjVnZWJnVHVCWDhIWkR4dDBFT1M5ZnBYNWxjYXRJR1g5NGVQdW9PcENYWDF1RVg4alpwYQpzZkpHSkRzdS9pTi9vMWZYcXU4Q0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFDa01VR0pPM2xycEppL2RKdmhZSkdwK29sMHQKQ3lUSVhrK2oyMDFhbmZKYkFiVllENStvb2FxUnRzNWFaa01RZ2loWjUyNGw2bGZ6N3NUNEE0M3VZL3lITmllRgpwb2RvdFFMWXlyRmRCcUoyaFhpcVFOQjRjNHloUXFkMG0rSTNwazJIMDNTOG85MWZ1VUJ3NWZSbDUxRUtIT3I1Ci84cldqdW55KzBRY1IvaEVLZlA5alV0NVZsbm4zMVJPMkhVeFUyTmlQTCtJK0dtWCtod3hzRFkyUk9TZ2xuWUsKcjNkaGU2RXpHQTZBcTJqMmtENTJteWFmNXNRY0NjeXg1cDlSNGdXcWxFTFU1VFZONldTWnVCT3AxQld6azI3NgpURFFRL0hVeHBGSTdZSEtTeVkza0xCb2JoSzViM0syS1RqQk45aEduMisxaHNETFM1R1ZRbkVQMlVTUT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo</span><span class="o">=</span>
+    server: https://k8smaster:6443
+  name: kubernetes
+contexts:
+- context:
+    cluster: kubernetes
+    user: kubernetes-admin
+  name: kubernetes-admin@kubernetes
+current-context: kubernetes-admin@kubernetes
+kind: Config
+preferences: <span class="o">{}</span>
+<span class="nb">users</span>:
+- name: kubernetes-admin
+  user:
+    client-certificate-data: <span class="nv">LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM4akNDQWRxZ0F3SUJBZ0lJVUpXVjZQeWhwSnd3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TURBeE1qZ3dPREk1TURsYUZ3MHlNVEF4TWpjd09ESTVNVEZhTURReApGekFWQmdOVkJBb1REbk41YzNSbGJUcHRZWE4wWlhKek1Sa3dGd1lEVlFRREV4QnJkV0psY201bGRHVnpMV0ZrCmJXbHVNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXpnRVhPY0JvZ1p2cGtlMysKVTdMcXBWVEVJMmc0Y241Wm5pNEhzVkYwdk9IQm9VTHlEZ1FBakYreDZNbEpYVlRGVWpxOXZkQm5pZFE3clJUWgoxL1g4a1BnSmVMbm8wNTgra213aHM3Y0F1T0pHQnlIamQ1TTVRaVFvM01ydGNQVlpVOHd3a3ZFT0dSa3JuOWlYCkNQeCt6WHhoNXNPRW9BRGR4TFJ1bVp1aGZoQXBFYlhSRVRHbTdCdnh4d2pneHBsdmoxR3gwTDBydlZLZTl6V0YKbGxCbTZpTW42NWlHMjVpVmZOcTVubDNRNCtMejFsejNENkRwamtaT2VEalJEcDZyOVYycVJzb2JocStOQjVFZQpRZXFMRUNqaWZ6aGwvRUZ0bmh1QmVTTXdyeHM2U1BzV2RyaHE5ZndHKzBDK2VjQmNvQ2xYV0xtcGp4cVF2dHJFCnlSckdGd0lEQVFBQm95Y3dKVEFPQmdOVkhROEJBZjhFQkFNQ0JhQXdFd1lEVlIwbEJBd3dDZ1lJS3dZQkJRVUgKQXdJd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFNcWQ3UWJ1MXpYQSsvZGRpWWYwQlI1cjdjMjUvalhGc25PVAp3RFBQT0ZrZ0tObDdsQy9xNndNdmNlUS9lRDl3Ti9ENUYwWlpHZDRSSWV0WklILzJSNklUNSs3V3RLK0dFRFp3CjFZL3p2MkVYeFZ1Y0ErNjZ6RzdtR3p1SnBJSkZwdjM0UlducEdSQ1lGMk52WDYwL2o4QTRiTnhsMXo1YWZDaDcKS0psd2RYYTdnK01qZXV6QmkzQmpOYnI4Mnh3bjNmVHJqWlBxYThqaGF0cWtPaHIwQkRnNUFzQTk4dEpnSDFmTgorU0prUkZ4OUREY0JXdDZGMDNYdW84TTk4L1RFcFc2cExzZWM0YjkyT0ZsUGg5Z2NlVXk0T3BnQnNYTElySDZoCkJCNTVyRmtLYWJ6ekhGYUV4RGxwSzZZczJnMDZZbmppVnBjU3N0WmludXBoV0s5S243RT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo</span><span class="o">=</span>
+    client-key-data: <span class="nv">LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcFFJQkFBS0NBUUVBemdFWE9jQm9nWnZwa2UzK1U3THFwVlRFSTJnNGNuNVpuaTRIc1ZGMHZPSEJvVUx5CkRnUUFqRit4Nk1sSlhWVEZVanE5dmRCbmlkUTdyUlRaMS9YOGtQZ0plTG5vMDU4K2ttd2hzN2NBdU9KR0J5SGoKZDVNNVFpUW8zTXJ0Y1BWWlU4d3drdkVPR1Jrcm45aVhDUHgrelh4aDVzT0VvQURkeExSdW1adWhmaEFwRWJYUgpFVEdtN0J2eHh3amd4cGx2ajFHeDBMMHJ2VktlOXpXRmxsQm02aU1uNjVpRzI1aVZmTnE1bmwzUTQrTHoxbHozCkQ2RHBqa1pPZURqUkRwNnI5VjJxUnNvYmhxK05CNUVlUWVxTEVDamlmemhsL0VGdG5odUJlU013cnhzNlNQc1cKZHJocTlmd0crMEMrZWNCY29DbFhXTG1wanhxUXZ0ckV5UnJHRndJREFRQUJBb0lCQVFDSitmTUxiRkxTMUpHcApleVVIL0dMckg0NUxSTWZoNzd5b2xKMzBadUZ3alNpNmtQTTg3Zk5NRWVCQVVXbEJDTUVzNVVrbXRFcFU1NENjCjJjVmF2MWhONU1PN1I1R3BCQlROejN6M09OQlVCTUh3andNaW1Nb1dBZEFZcWhaRXZSLzZYMTM5WFZVYS9GL2EKclIva0ZmSDhRWjMxQ09sd25ZUHI5d25JK3BNOHNmTGdqemFjYTNCdTNWMkx1Z29XcURQTFZiMjRiT0RLK3RVZwo4Q0ErSjhPemRreHgvNThxT2h3bWVNT0wydkdXbGVhVkkrVHBMUjhObEFRQXdkR04xVTNrcGRtZElhS0d2SG0zCmt4OUpQNExyeDI2emMxSTVROEZ1VGNkQlc4QzVoaHZLVC9tMDZ6WGFwWDhFN0ZVYWxOWkdFOWFHd1h1K1dpc2oKNDlSQ0pwb1JBb0dCQU01eGhDUGMvNkFqK091a0xORmVCVU1VTEc4VU54MkF5a3pVRFlUWkNUd1FJQ01YamxQRAo4YStSMmJHRit1N0d4b3c5K091WnFzcjVyK0tIN3BVQkZlVWUyenZvM0FRQzFPb2YrRjBZK2hzMm5tNmdFTVN1CmF2b0NZVW10R2dCVE16QWs0d2tEUWIzNldWUFFNT2ZNaGRNMjdpc2s3TFp5Znl1bzkwRnlobzlmQW9HQkFQOTAKbGtBSTh6b3dvYmZWZUZhVVV0ei9nSDNzNkxwRnhkSFlHZnRCYS9JSXNwKzRwV1dJL0V1YjRXUnk0c3ZOaDNPdAozSitGRnZWclVicFB6Q2VKbm0xVHY5N3FOVVRQa1B4blhnVXdiMFEvVHhRODFIRmoweWlDRGFTVGw4RUx3ejQ1Cm1xYVB6dDA5RTFOVHJpNFBQTWh3WmV5Y2k0Y3drS0c3c0kwaFlweEpBb0dCQUtPVEhuaXNLMy9nQU9QMWVlMksKNmZCMGs2Q1FDL3U4aUk3SGxzNmtpY1Nsb2xFcjRRSk9SN290ZnFoQzJNbEpoeGlvSWd2TC9xQkZweTkvTlhPcgpJSVlqSk9NYlp2bG1wUDI5eHpVOURTOXkzNllYL2pGWllqb21tSitnSVBJUStvWXpOQkY0R3lkRXJuTFNpMjJmCmlJb0xCRHY3VGZSaVZKRnJtRDZyV0NOUkFvR0FZUUN1aFVaZ3hmbnRqdGNheVJXdG1ZblVDdjFKS21LUVNhemIKd05NSTRIRjVFcm1VNU1kdHRuQk0yRTNmM1RBQWZXYkozakUxbEovWit2dU9OSDFIa1pBNXpiWDE0RmxKWHU4Sgpmc0x6bldERThKUmd2MlgrcXVVbnRSVHVqVG1nUENLM25RUUNzM1Fid0lxSUc2bGhsV05JOE41SkJWN2xyT1NPCm1DalRQekVDZ1lFQXRkMXprbzJUQWwwK05zZEliNkZKV2huV2tVM3hSdmdJZGRxcDYydUZXOXl0VDB3VUFpRGYKdmNYRkhDcFNTNnRDZDU0WHVoUzNPeGVuak5Ga0c3MzRtTEh3Z2JMWUl4Q2c1YVBBcFlMMG9QL2lZUFJBNTBROApUWEM2L1JLYWd2TURLZkphS293WVR4aS85TTJ1QUxYNVdia2xvZnlCQzVjQXBhb1Ribll0czE0PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo</span><span class="o">=</span>
+
+<span class="c"># client-cert를 추출</span>
+ps0107@k8smaster1:~<span class="nv">$ </span><span class="nb">export </span><span class="nv">client</span><span class="o">=</span><span class="si">$(</span><span class="nb">grep </span>client-cert ~/.kube/config | <span class="nb">cut</span> <span class="nt">-d</span> <span class="s2">" "</span> <span class="nt">-f</span> 6<span class="si">)</span>
+ps0107@k8smaster1:~<span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$client</span>
+<span class="nv">LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM4akNDQWRxZ0F3SUJBZ0lJVUpXVjZQeWhwSnd3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TURBeE1qZ3dPREk1TURsYUZ3MHlNVEF4TWpjd09ESTVNVEZhTURReApGekFWQmdOVkJBb1REbk41YzNSbGJUcHRZWE4wWlhKek1Sa3dGd1lEVlFRREV4QnJkV0psY201bGRHVnpMV0ZrCmJXbHVNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXpnRVhPY0JvZ1p2cGtlMysKVTdMcXBWVEVJMmc0Y241Wm5pNEhzVkYwdk9IQm9VTHlEZ1FBakYreDZNbEpYVlRGVWpxOXZkQm5pZFE3clJUWgoxL1g4a1BnSmVMbm8wNTgra213aHM3Y0F1T0pHQnlIamQ1TTVRaVFvM01ydGNQVlpVOHd3a3ZFT0dSa3JuOWlYCkNQeCt6WHhoNXNPRW9BRGR4TFJ1bVp1aGZoQXBFYlhSRVRHbTdCdnh4d2pneHBsdmoxR3gwTDBydlZLZTl6V0YKbGxCbTZpTW42NWlHMjVpVmZOcTVubDNRNCtMejFsejNENkRwamtaT2VEalJEcDZyOVYycVJzb2JocStOQjVFZQpRZXFMRUNqaWZ6aGwvRUZ0bmh1QmVTTXdyeHM2U1BzV2RyaHE5ZndHKzBDK2VjQmNvQ2xYV0xtcGp4cVF2dHJFCnlSckdGd0lEQVFBQm95Y3dKVEFPQmdOVkhROEJBZjhFQkFNQ0JhQXdFd1lEVlIwbEJBd3dDZ1lJS3dZQkJRVUgKQXdJd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFNcWQ3UWJ1MXpYQSsvZGRpWWYwQlI1cjdjMjUvalhGc25PVAp3RFBQT0ZrZ0tObDdsQy9xNndNdmNlUS9lRDl3Ti9ENUYwWlpHZDRSSWV0WklILzJSNklUNSs3V3RLK0dFRFp3CjFZL3p2MkVYeFZ1Y0ErNjZ6RzdtR3p1SnBJSkZwdjM0UlducEdSQ1lGMk52WDYwL2o4QTRiTnhsMXo1YWZDaDcKS0psd2RYYTdnK01qZXV6QmkzQmpOYnI4Mnh3bjNmVHJqWlBxYThqaGF0cWtPaHIwQkRnNUFzQTk4dEpnSDFmTgorU0prUkZ4OUREY0JXdDZGMDNYdW84TTk4L1RFcFc2cExzZWM0YjkyT0ZsUGg5Z2NlVXk0T3BnQnNYTElySDZoCkJCNTVyRmtLYWJ6ekhGYUV4RGxwSzZZczJnMDZZbmppVnBjU3N0WmludXBoV0s5S243RT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo</span><span class="o">=</span>
+
+<span class="c"># client-key-data를 추출</span>
+ps0107@k8smaster1:~<span class="nv">$ </span><span class="nb">export </span><span class="nv">key</span><span class="o">=</span><span class="si">$(</span><span class="nb">grep </span>client-key-data ~/.kube/config | <span class="nb">cut</span> <span class="nt">-d</span> <span class="s2">" "</span> <span class="nt">-f</span> 6<span class="si">)</span>
+ps0107@k8smaster1:~<span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$key</span>
+<span class="nv">LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcFFJQkFBS0NBUUVBemdFWE9jQm9nWnZwa2UzK1U3THFwVlRFSTJnNGNuNVpuaTRIc1ZGMHZPSEJvVUx5CkRnUUFqRit4Nk1sSlhWVEZVanE5dmRCbmlkUTdyUlRaMS9YOGtQZ0plTG5vMDU4K2ttd2hzN2NBdU9KR0J5SGoKZDVNNVFpUW8zTXJ0Y1BWWlU4d3drdkVPR1Jrcm45aVhDUHgrelh4aDVzT0VvQURkeExSdW1adWhmaEFwRWJYUgpFVEdtN0J2eHh3amd4cGx2ajFHeDBMMHJ2VktlOXpXRmxsQm02aU1uNjVpRzI1aVZmTnE1bmwzUTQrTHoxbHozCkQ2RHBqa1pPZURqUkRwNnI5VjJxUnNvYmhxK05CNUVlUWVxTEVDamlmemhsL0VGdG5odUJlU013cnhzNlNQc1cKZHJocTlmd0crMEMrZWNCY29DbFhXTG1wanhxUXZ0ckV5UnJHRndJREFRQUJBb0lCQVFDSitmTUxiRkxTMUpHcApleVVIL0dMckg0NUxSTWZoNzd5b2xKMzBadUZ3alNpNmtQTTg3Zk5NRWVCQVVXbEJDTUVzNVVrbXRFcFU1NENjCjJjVmF2MWhONU1PN1I1R3BCQlROejN6M09OQlVCTUh3andNaW1Nb1dBZEFZcWhaRXZSLzZYMTM5WFZVYS9GL2EKclIva0ZmSDhRWjMxQ09sd25ZUHI5d25JK3BNOHNmTGdqemFjYTNCdTNWMkx1Z29XcURQTFZiMjRiT0RLK3RVZwo4Q0ErSjhPemRreHgvNThxT2h3bWVNT0wydkdXbGVhVkkrVHBMUjhObEFRQXdkR04xVTNrcGRtZElhS0d2SG0zCmt4OUpQNExyeDI2emMxSTVROEZ1VGNkQlc4QzVoaHZLVC9tMDZ6WGFwWDhFN0ZVYWxOWkdFOWFHd1h1K1dpc2oKNDlSQ0pwb1JBb0dCQU01eGhDUGMvNkFqK091a0xORmVCVU1VTEc4VU54MkF5a3pVRFlUWkNUd1FJQ01YamxQRAo4YStSMmJHRit1N0d4b3c5K091WnFzcjVyK0tIN3BVQkZlVWUyenZvM0FRQzFPb2YrRjBZK2hzMm5tNmdFTVN1CmF2b0NZVW10R2dCVE16QWs0d2tEUWIzNldWUFFNT2ZNaGRNMjdpc2s3TFp5Znl1bzkwRnlobzlmQW9HQkFQOTAKbGtBSTh6b3dvYmZWZUZhVVV0ei9nSDNzNkxwRnhkSFlHZnRCYS9JSXNwKzRwV1dJL0V1YjRXUnk0c3ZOaDNPdAozSitGRnZWclVicFB6Q2VKbm0xVHY5N3FOVVRQa1B4blhnVXdiMFEvVHhRODFIRmoweWlDRGFTVGw4RUx3ejQ1Cm1xYVB6dDA5RTFOVHJpNFBQTWh3WmV5Y2k0Y3drS0c3c0kwaFlweEpBb0dCQUtPVEhuaXNLMy9nQU9QMWVlMksKNmZCMGs2Q1FDL3U4aUk3SGxzNmtpY1Nsb2xFcjRRSk9SN290ZnFoQzJNbEpoeGlvSWd2TC9xQkZweTkvTlhPcgpJSVlqSk9NYlp2bG1wUDI5eHpVOURTOXkzNllYL2pGWllqb21tSitnSVBJUStvWXpOQkY0R3lkRXJuTFNpMjJmCmlJb0xCRHY3VGZSaVZKRnJtRDZyV0NOUkFvR0FZUUN1aFVaZ3hmbnRqdGNheVJXdG1ZblVDdjFKS21LUVNhemIKd05NSTRIRjVFcm1VNU1kdHRuQk0yRTNmM1RBQWZXYkozakUxbEovWit2dU9OSDFIa1pBNXpiWDE0RmxKWHU4Sgpmc0x6bldERThKUmd2MlgrcXVVbnRSVHVqVG1nUENLM25RUUNzM1Fid0lxSUc2bGhsV05JOE41SkJWN2xyT1NPCm1DalRQekVDZ1lFQXRkMXprbzJUQWwwK05zZEliNkZKV2huV2tVM3hSdmdJZGRxcDYydUZXOXl0VDB3VUFpRGYKdmNYRkhDcFNTNnRDZDU0WHVoUzNPeGVuak5Ga0c3MzRtTEh3Z2JMWUl4Q2c1YVBBcFlMMG9QL2lZUFJBNTBROApUWEM2L1JLYWd2TURLZkphS293WVR4aS85TTJ1QUxYNVdia2xvZnlCQzVjQXBhb1Ribll0czE0PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo</span><span class="o">=</span>
+
+<span class="c"># certificate-authority-data 를 추출</span>
+ps0107@k8smaster1:~<span class="nv">$ </span><span class="nb">export </span><span class="nv">auth</span><span class="o">=</span><span class="si">$(</span><span class="nb">grep </span>certificate-authority-data ~/.kube/config | <span class="nb">cut</span> <span class="nt">-d</span> <span class="s2">" "</span> <span class="nt">-f</span> 6<span class="si">)</span>
+ps0107@k8smaster1:~<span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$auth</span>
+<span class="nv">LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJd01ERXlPREE0TWprd09Wb1hEVE13TURFeU5UQTRNamt3T1Zvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTk9XCjZMdDkweTMvZDU2VEdIZFFWR25hZGtScXhPUERPYmplOVpUTkVIU3JWZUU3NWpPQ1A0RWdaTFVxcjBBWm5mSTIKQ0hSU3ZGdkdUT2Qza0o0bnRMS0RrT21VaWV4N2s0ZnRJM0lNc0RraDM4OTMzaGxMRDBBTzZzR3cvUnZpaVJ2Swo1N0RLVjRBaXFTTkRabXlpRFJHRFAvc3o1NllzTEdhQXJTUzVwcFYrQ2NKanhHeXV2UXNKZmZEekJsZ2FCakRoCmlWcDhrdTBNVUpFRktLbDNTNnhLZXRZRTRwZVpNcmlGZUpBb0pVZTZscmpYRWplVVN1a29FdmxmbGJIMGhWL3IKWk1ydkwwaGRKeWdIQjVnZWJnVHVCWDhIWkR4dDBFT1M5ZnBYNWxjYXRJR1g5NGVQdW9PcENYWDF1RVg4alpwYQpzZkpHSkRzdS9pTi9vMWZYcXU4Q0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFDa01VR0pPM2xycEppL2RKdmhZSkdwK29sMHQKQ3lUSVhrK2oyMDFhbmZKYkFiVllENStvb2FxUnRzNWFaa01RZ2loWjUyNGw2bGZ6N3NUNEE0M3VZL3lITmllRgpwb2RvdFFMWXlyRmRCcUoyaFhpcVFOQjRjNHloUXFkMG0rSTNwazJIMDNTOG85MWZ1VUJ3NWZSbDUxRUtIT3I1Ci84cldqdW55KzBRY1IvaEVLZlA5alV0NVZsbm4zMVJPMkhVeFUyTmlQTCtJK0dtWCtod3hzRFkyUk9TZ2xuWUsKcjNkaGU2RXpHQTZBcTJqMmtENTJteWFmNXNRY0NjeXg1cDlSNGdXcWxFTFU1VFZONldTWnVCT3AxQld6azI3NgpURFFRL0hVeHBGSTdZSEtTeVkza0xCb2JoSzViM0syS1RqQk45aEduMisxaHNETFM1R1ZRbkVQMlVTUT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo</span><span class="o">=</span>
+
+<span class="c"># 각 key정보를 base64로 인코딩하여 파일로 저장</span>
+ps0107@k8smaster1:~<span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$client</span> | <span class="nb">base64</span> <span class="nt">-d</span> - <span class="o">&gt;</span> ./client.pem
+ps0107@k8smaster1:~<span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$key</span> | <span class="nb">base64</span> <span class="nt">-d</span> - <span class="o">&gt;</span> ./client-key.pem
+ps0107@k8smaster1:~<span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$auth</span> | <span class="nb">base64</span> <span class="nt">-d</span> - <span class="o">&gt;</span> ./ca.pem
+</pre></table></code></div></div><h3 id="저장된-인증서-정보를-이용하여-api-호출을-할-수-있다">저장된 인증서 정보를 이용하여 api 호출을 할 수 있다.</h3><div lang="bash" class="language-bash highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+</pre><td class="rouge-code"><pre><span class="c"># api server 정보를 확인</span>
+ps0107@k8smaster1:~<span class="nv">$ </span>kubectl config view | <span class="nb">grep </span>server
+    server: https://k8smaster:6443
+
+<span class="c"># key를 이용하여 /api/v1/pods 에 대한 api를 호출해본다.</span>
+ps0107@k8smaster1:~<span class="nv">$ </span>curl <span class="nt">--cert</span> ./client.pem <span class="nt">--key</span> ./client-key.pem <span class="nt">--cacert</span> ./ca.pem https://k8smaster:6443/api/v1/pods
+<span class="o">{</span>
+  <span class="s2">"kind"</span>: <span class="s2">"PodList"</span>,
+  <span class="s2">"apiVersion"</span>: <span class="s2">"v1"</span>,
+  <span class="s2">"metadata"</span>: <span class="o">{</span>
+    <span class="s2">"selfLink"</span>: <span class="s2">"/api/v1/pods"</span>,
+    <span class="s2">"resourceVersion"</span>: <span class="s2">"296347"</span>
+  <span class="o">}</span>,
+......
+
+<span class="c"># curl 로 api를 호출하여 pod를 생성해 본다</span>
+ps0107@k8smaster1:~<span class="nv">$ </span>vi curlpod.json
+ps0107@k8smaster1:~<span class="nv">$ </span><span class="nb">cat </span>curlpod.json
+<span class="o">{</span>
+  <span class="s2">"kind"</span>: <span class="s2">"Pod"</span>,
+  <span class="s2">"apiVersion"</span>: <span class="s2">"v1"</span>,
+  <span class="s2">"metadata"</span>: <span class="o">{</span>
+    <span class="s2">"name"</span>: <span class="s2">"curlpod"</span>,
+    <span class="s2">"namespace"</span>: <span class="s2">"default"</span>,
+    <span class="s2">"labels"</span>: <span class="o">{</span>
+      <span class="s2">"name"</span>: <span class="s2">"examplepod"</span>
+    <span class="o">}</span>
+  <span class="o">}</span>,
+  <span class="s2">"spec"</span>: <span class="o">{</span>
+    <span class="s2">"containers"</span>: <span class="o">[{</span>
+      <span class="s2">"name"</span>: <span class="s2">"nginx"</span>,
+      <span class="s2">"image"</span>: <span class="s2">"nginx"</span>,
+      <span class="s2">"ports"</span>: <span class="o">[{</span><span class="s2">"containerPort"</span>: 80<span class="o">}]</span>
+    <span class="o">}]</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+ps0107@k8smaster1:~<span class="nv">$ </span>curl <span class="nt">--cert</span> ./client.pem <span class="nt">--key</span> ./client-key.pem <span class="nt">--cacert</span> ./ca.pem <span class="se">\</span>
+https://k8smaster:6443/api/v1/namespaces/default/pods <span class="nt">-XPOST</span> <span class="nt">-H</span><span class="s1">'Content-Type: application/json'</span> <span class="nt">-d</span>@curlpod.json
+<span class="o">{</span>
+  <span class="s2">"kind"</span>: <span class="s2">"Pod"</span>,
+  <span class="s2">"apiVersion"</span>: <span class="s2">"v1"</span>,
+  <span class="s2">"metadata"</span>: <span class="o">{</span>
+    <span class="s2">"name"</span>: <span class="s2">"curlpod"</span>,
+    <span class="s2">"namespace"</span>: <span class="s2">"default"</span>,
+    <span class="s2">"selfLink"</span>: <span class="s2">"/api/v1/namespaces/default/pods/curlpod"</span>,
+    <span class="s2">"uid"</span>: <span class="s2">"d50e5569-88c3-4e0c-9259-85dd07446013"</span>,
+    <span class="s2">"resourceVersion"</span>: <span class="s2">"296389"</span>,
+    <span class="s2">"creationTimestamp"</span>: <span class="s2">"2020-01-30T21:38:35Z"</span>,
+    <span class="s2">"labels"</span>: <span class="o">{</span>
+      <span class="s2">"name"</span>: <span class="s2">"examplepod"</span>
+    <span class="o">}</span>
+  <span class="o">}</span>,
+  <span class="s2">"spec"</span>: <span class="o">{</span>
+    <span class="s2">"volumes"</span>: <span class="o">[</span>
+      <span class="o">{</span>
+        <span class="s2">"name"</span>: <span class="s2">"default-token-76w5h"</span>,
+        <span class="s2">"secret"</span>: <span class="o">{</span>
+          <span class="s2">"secretName"</span>: <span class="s2">"default-token-76w5h"</span>,
+          <span class="s2">"defaultMode"</span>: 420
+        <span class="o">}</span>
+      <span class="o">}</span>
+    <span class="o">]</span>,
+    <span class="s2">"containers"</span>: <span class="o">[</span>
+      <span class="o">{</span>
+        <span class="s2">"name"</span>: <span class="s2">"nginx"</span>,
+        <span class="s2">"image"</span>: <span class="s2">"nginx"</span>,
+        <span class="s2">"ports"</span>: <span class="o">[</span>
+          <span class="o">{</span>
+            <span class="s2">"containerPort"</span>: 80,
+            <span class="s2">"protocol"</span>: <span class="s2">"TCP"</span>
+          <span class="o">}</span>
+        <span class="o">]</span>,
+        <span class="s2">"resources"</span>: <span class="o">{</span>
+
+        <span class="o">}</span>,
+        <span class="s2">"volumeMounts"</span>: <span class="o">[</span>
+          <span class="o">{</span>
+            <span class="s2">"name"</span>: <span class="s2">"default-token-76w5h"</span>,
+            <span class="s2">"readOnly"</span>: <span class="nb">true</span>,
+            <span class="s2">"mountPath"</span>: <span class="s2">"/var/run/secrets/kubernetes.io/serviceaccount"</span>
+          <span class="o">}</span>
+        <span class="o">]</span>,
+        <span class="s2">"terminationMessagePath"</span>: <span class="s2">"/dev/termination-log"</span>,
+        <span class="s2">"terminationMessagePolicy"</span>: <span class="s2">"File"</span>,
+        <span class="s2">"imagePullPolicy"</span>: <span class="s2">"Always"</span>
+      <span class="o">}</span>
+    <span class="o">]</span>,
+    <span class="s2">"restartPolicy"</span>: <span class="s2">"Always"</span>,
+    <span class="s2">"terminationGracePeriodSeconds"</span>: 30,
+    <span class="s2">"dnsPolicy"</span>: <span class="s2">"ClusterFirst"</span>,
+    <span class="s2">"serviceAccountName"</span>: <span class="s2">"default"</span>,
+    <span class="s2">"serviceAccount"</span>: <span class="s2">"default"</span>,
+    <span class="s2">"securityContext"</span>: <span class="o">{</span>
+
+    <span class="o">}</span>,
+    <span class="s2">"schedulerName"</span>: <span class="s2">"default-scheduler"</span>,
+    <span class="s2">"tolerations"</span>: <span class="o">[</span>
+      <span class="o">{</span>
+        <span class="s2">"key"</span>: <span class="s2">"node.kubernetes.io/not-ready"</span>,
+        <span class="s2">"operator"</span>: <span class="s2">"Exists"</span>,
+        <span class="s2">"effect"</span>: <span class="s2">"NoExecute"</span>,
+        <span class="s2">"tolerationSeconds"</span>: 300
+      <span class="o">}</span>,
+      <span class="o">{</span>
+        <span class="s2">"key"</span>: <span class="s2">"node.kubernetes.io/unreachable"</span>,
+        <span class="s2">"operator"</span>: <span class="s2">"Exists"</span>,
+        <span class="s2">"effect"</span>: <span class="s2">"NoExecute"</span>,
+        <span class="s2">"tolerationSeconds"</span>: 300
+      <span class="o">}</span>
+    <span class="o">]</span>,
+    <span class="s2">"priority"</span>: 0,
+    <span class="s2">"enableServiceLinks"</span>: <span class="nb">true</span>
+  <span class="o">}</span>,
+  <span class="s2">"status"</span>: <span class="o">{</span>
+    <span class="s2">"phase"</span>: <span class="s2">"Pending"</span>,
+    <span class="s2">"qosClass"</span>: <span class="s2">"BestEffort"</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="c"># 생성된 pod를 확인해본다</span>
+ps0107@k8smaster1:~<span class="nv">$ </span>kubectl get pods
+NAME      READY   STATUS    RESTARTS   AGE
+curlpod   1/1     Running   0          6s
+</pre></table></code></div></div><h3 id="explore-api-calls-로컬에-캐싱됨--확인">Explore API Calls (로컬에 캐싱됨 =&gt; 확인)</h3><div lang="bash" class="language-bash highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549
+550
+551
+552
+553
+554
+555
+556
+557
+558
+559
+560
+561
+562
+563
+564
+565
+566
+567
+568
+569
+570
+571
+572
+573
+574
+575
+576
+577
+578
+579
+580
+581
+582
+583
+584
+585
+586
+587
+588
+589
+590
+591
+592
+593
+594
+595
+596
+597
+598
+599
+600
+601
+602
+603
+604
+605
+606
+607
+608
+609
+610
+611
+612
+613
+614
+615
+616
+617
+618
+619
+620
+621
+622
+623
+624
+625
+626
+627
+628
+629
+630
+631
+632
+633
+634
+635
+636
+637
+638
+639
+640
+641
+642
+643
+644
+645
+646
+647
+648
+649
+650
+651
+652
+653
+654
+655
+656
+657
+658
+659
+660
+661
+662
+663
+664
+665
+666
+667
+668
+669
+670
+671
+672
+673
+674
+675
+676
+677
+678
+679
+680
+681
+682
+683
+684
+685
+686
+687
+688
+689
+690
+691
+692
+693
+694
+695
+696
+697
+698
+699
+700
+701
+702
+703
+704
+705
+706
+707
+708
+709
+710
+711
+712
+713
+</pre><td class="rouge-code"><pre><span class="c"># kubectl get endpoints 명령을 내리면 어떤 것을 참조 하는지 알아본다.</span>
+ps0107@k8smaster1:~<span class="nv">$ </span>kubectl get endpoints
+NAME         ENDPOINTS         AGE
+kubernetes   10.146.0.2:6443   2d13h
+
+<span class="c"># openat 부분에 보면 캐싱을 참조하는 것을 확인할 수 있다.</span>
+ps0107@k8smaster1:~<span class="nv">$ </span>strace kubectl get endpoints
+execve<span class="o">(</span><span class="s2">"/usr/bin/kubectl"</span>, <span class="o">[</span><span class="s2">"kubectl"</span>, <span class="s2">"get"</span>, <span class="s2">"endpoints"</span><span class="o">]</span>, <span class="o">[</span>/<span class="k">*</span> 25 vars <span class="k">*</span>/]<span class="o">)</span> <span class="o">=</span> 0
+arch_prctl<span class="o">(</span>ARCH_SET_FS, 0x2d082d0<span class="o">)</span>      <span class="o">=</span> 0
+.....
+openat<span class="o">(</span>AT_FDCWD, <span class="s2">"/home/ps0107/.kube/cache/discovery/k8smaster_6443/authorization.k8s.io/v1/serverresources.json"</span>, O_RDONLY|O_CLOEXEC<span class="o">)</span> <span class="o">=</span> 5
+epoll_ctl<span class="o">(</span>4, EPOLL_CTL_ADD, 5, <span class="o">{</span>EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, <span class="o">{</span><span class="nv">u32</span><span class="o">=</span>1026301704, <span class="nv">u64</span><span class="o">=</span>139918175903496<span class="o">}})</span> <span class="o">=</span> <span class="nt">-1</span> EPERM <span class="o">(</span>Operation not permitted<span class="o">)</span>
+epoll_ctl<span class="o">(</span>4, EPOLL_CTL_DEL, 5, 0xc00076cb7c<span class="o">)</span> <span class="o">=</span> <span class="nt">-1</span> EPERM <span class="o">(</span>Operation not permitted<span class="o">)</span>
+.....
+
+<span class="c"># 해당 캐싱된 파일의 경로를 가보자</span>
+ps0107@k8smaster1:~<span class="nv">$ </span><span class="nb">cd</span> /home/ps0107/.kube/cache/discovery/
+ps0107@k8smaster1:~/.kube/cache/discovery<span class="nv">$ </span><span class="nb">cd </span>k8smaster_6443/
+
+<span class="c"># 여러가지가 캐싱된 것을 확인할 수 있다.</span>
+ps0107@k8smaster1:~/.kube/cache/discovery/k8smaster_6443<span class="nv">$ </span><span class="nb">ls
+</span>admissionregistration.k8s.io  authentication.k8s.io  certificates.k8s.io    extensions         rbac.authorization.k8s.io  v1
+apiextensions.k8s.io          authorization.k8s.io   coordination.k8s.io    networking.k8s.io  scheduling.k8s.io
+apiregistration.k8s.io        autoscaling            crd.projectcalico.org  node.k8s.io        servergroups.json
+apps                          batch                  events.k8s.io          policy             storage.k8s.io
+
+ps0107@k8smaster1:~/.kube/cache/discovery/k8smaster_6443<span class="nv">$ </span>find <span class="nb">.</span>
+<span class="nb">.</span>
+./apiextensions.k8s.io
+./apiextensions.k8s.io/v1beta1
+./apiextensions.k8s.io/v1beta1/serverresources.json
+./apps
+./apps/v1beta2
+./apps/v1beta2/serverresources.json
+./apps/v1
+./apps/v1/serverresources.json
+./apps/v1beta1
+./apps/v1beta1/serverresources.json
+./policy
+./policy/v1beta1
+./policy/v1beta1/serverresources.json
+./storage.k8s.io
+./storage.k8s.io/v1
+./storage.k8s.io/v1/serverresources.json
+./storage.k8s.io/v1beta1
+./storage.k8s.io/v1beta1/serverresources.json
+./batch
+./batch/v1
+./batch/v1/serverresources.json
+./batch/v1beta1
+./batch/v1beta1/serverresources.json
+./events.k8s.io
+./events.k8s.io/v1beta1
+./events.k8s.io/v1beta1/serverresources.json
+./coordination.k8s.io
+./coordination.k8s.io/v1
+./coordination.k8s.io/v1/serverresources.json
+./coordination.k8s.io/v1beta1
+./coordination.k8s.io/v1beta1/serverresources.json
+./scheduling.k8s.io
+./scheduling.k8s.io/v1
+./scheduling.k8s.io/v1/serverresources.json
+./scheduling.k8s.io/v1beta1
+./scheduling.k8s.io/v1beta1/serverresources.json
+./certificates.k8s.io
+./certificates.k8s.io/v1beta1
+./certificates.k8s.io/v1beta1/serverresources.json
+./authentication.k8s.io
+./authentication.k8s.io/v1
+./authentication.k8s.io/v1/serverresources.json
+./authentication.k8s.io/v1beta1
+./authentication.k8s.io/v1beta1/serverresources.json
+./v1
+./v1/serverresources.json
+./admissionregistration.k8s.io
+./admissionregistration.k8s.io/v1beta1
+./admissionregistration.k8s.io/v1beta1/serverresources.json
+./servergroups.json
+./authorization.k8s.io
+./authorization.k8s.io/v1
+./authorization.k8s.io/v1/serverresources.json
+./authorization.k8s.io/v1beta1
+./authorization.k8s.io/v1beta1/serverresources.json
+./networking.k8s.io
+./networking.k8s.io/v1
+./networking.k8s.io/v1/serverresources.json
+./networking.k8s.io/v1beta1
+./networking.k8s.io/v1beta1/serverresources.json
+./node.k8s.io
+./node.k8s.io/v1beta1
+./node.k8s.io/v1beta1/serverresources.json
+./rbac.authorization.k8s.io
+./rbac.authorization.k8s.io/v1
+./rbac.authorization.k8s.io/v1/serverresources.json
+./rbac.authorization.k8s.io/v1beta1
+./rbac.authorization.k8s.io/v1beta1/serverresources.json
+./apiregistration.k8s.io
+./apiregistration.k8s.io/v1
+./apiregistration.k8s.io/v1/serverresources.json
+./apiregistration.k8s.io/v1beta1
+./apiregistration.k8s.io/v1beta1/serverresources.json
+./crd.projectcalico.org
+./crd.projectcalico.org/v1
+./crd.projectcalico.org/v1/serverresources.json
+./extensions
+./extensions/v1beta1
+./extensions/v1beta1/serverresources.json
+./autoscaling
+./autoscaling/v1
+./autoscaling/v1/serverresources.json
+./autoscaling/v2beta2
+./autoscaling/v2beta2/serverresources.json
+./autoscaling/v2beta1
+./autoscaling/v2beta1/serverresources.json
+
+ps0107@k8smaster1:~/.kube/cache/discovery/k8smaster_6443<span class="nv">$ </span>python <span class="nt">-m</span> json.tool v1/serverresources.json
+<span class="o">{</span>
+    <span class="s2">"apiVersion"</span>: <span class="s2">"v1"</span>,
+    <span class="s2">"groupVersion"</span>: <span class="s2">"v1"</span>,
+    <span class="s2">"kind"</span>: <span class="s2">"APIResourceList"</span>,
+    <span class="s2">"resources"</span>: <span class="o">[</span>
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"Binding"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"bindings"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"ComponentStatus"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"componentstatuses"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">false</span>,
+            <span class="s2">"shortNames"</span>: <span class="o">[</span>
+                <span class="s2">"cs"</span>
+            <span class="o">]</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"ConfigMap"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"configmaps"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"shortNames"</span>: <span class="o">[</span>
+                <span class="s2">"cm"</span>
+            <span class="o">]</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"qFsyl6wFWjQ="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"deletecollection"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"Endpoints"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"endpoints"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"shortNames"</span>: <span class="o">[</span>
+                <span class="s2">"ep"</span>
+            <span class="o">]</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"fWeeMqaN/OA="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"deletecollection"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"Event"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"events"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"shortNames"</span>: <span class="o">[</span>
+                <span class="s2">"ev"</span>
+            <span class="o">]</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"r2yiGXH7wu8="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"deletecollection"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"LimitRange"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"limitranges"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"shortNames"</span>: <span class="o">[</span>
+                <span class="s2">"limits"</span>
+            <span class="o">]</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"EBKMFVe6cwo="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"deletecollection"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"Namespace"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"namespaces"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">false</span>,
+            <span class="s2">"shortNames"</span>: <span class="o">[</span>
+                <span class="s2">"ns"</span>
+            <span class="o">]</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"Q3oi5N2YM8M="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"Namespace"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"namespaces/finalize"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">false</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"update"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"Namespace"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"namespaces/status"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">false</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"get"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"Node"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"nodes"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">false</span>,
+            <span class="s2">"shortNames"</span>: <span class="o">[</span>
+                <span class="s2">"no"</span>
+            <span class="o">]</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"XwShjMxG9Fs="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"deletecollection"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"NodeProxyOptions"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"nodes/proxy"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">false</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"Node"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"nodes/status"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">false</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"get"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"PersistentVolumeClaim"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"persistentvolumeclaims"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"shortNames"</span>: <span class="o">[</span>
+                <span class="s2">"pvc"</span>
+            <span class="o">]</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"QWTyNDq0dC4="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"deletecollection"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"PersistentVolumeClaim"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"persistentvolumeclaims/status"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"get"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"PersistentVolume"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"persistentvolumes"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">false</span>,
+            <span class="s2">"shortNames"</span>: <span class="o">[</span>
+                <span class="s2">"pv"</span>
+            <span class="o">]</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"HN/zwEC+JgM="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"deletecollection"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"PersistentVolume"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"persistentvolumes/status"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">false</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"get"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"categories"</span>: <span class="o">[</span>
+                <span class="s2">"all"</span>
+            <span class="o">]</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Pod"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"pods"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"shortNames"</span>: <span class="o">[</span>
+                <span class="s2">"po"</span>
+            <span class="o">]</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"xPOwRZ+Yhw8="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"deletecollection"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"PodAttachOptions"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"pods/attach"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"get"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"Binding"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"pods/binding"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"group"</span>: <span class="s2">"policy"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Eviction"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"pods/eviction"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>
+            <span class="o">]</span>,
+            <span class="s2">"version"</span>: <span class="s2">"v1beta1"</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"PodExecOptions"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"pods/exec"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"get"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"Pod"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"pods/log"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"get"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"PodPortForwardOptions"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"pods/portforward"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"get"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"PodProxyOptions"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"pods/proxy"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"Pod"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"pods/status"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"get"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"PodTemplate"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"podtemplates"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"LIXB2x4IFpk="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"deletecollection"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"categories"</span>: <span class="o">[</span>
+                <span class="s2">"all"</span>
+            <span class="o">]</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"ReplicationController"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"replicationcontrollers"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"shortNames"</span>: <span class="o">[</span>
+                <span class="s2">"rc"</span>
+            <span class="o">]</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"Jond2If31h0="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"deletecollection"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"group"</span>: <span class="s2">"autoscaling"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Scale"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"replicationcontrollers/scale"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"get"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>
+            <span class="o">]</span>,
+            <span class="s2">"version"</span>: <span class="s2">"v1"</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"ReplicationController"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"replicationcontrollers/status"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"get"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"ResourceQuota"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"resourcequotas"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"shortNames"</span>: <span class="o">[</span>
+                <span class="s2">"quota"</span>
+            <span class="o">]</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"8uhSgffRX6w="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"deletecollection"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"ResourceQuota"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"resourcequotas/status"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"get"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"Secret"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"secrets"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"S6u1pOWzb84="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"deletecollection"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"ServiceAccount"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"serviceaccounts"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"shortNames"</span>: <span class="o">[</span>
+                <span class="s2">"sa"</span>
+            <span class="o">]</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"pbx9ZvyFpBE="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"deletecollection"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"categories"</span>: <span class="o">[</span>
+                <span class="s2">"all"</span>
+            <span class="o">]</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Service"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"services"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"shortNames"</span>: <span class="o">[</span>
+                <span class="s2">"svc"</span>
+            <span class="o">]</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"storageVersionHash"</span>: <span class="s2">"0/CO1lhkEBI="</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"list"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>,
+                <span class="s2">"watch"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"ServiceProxyOptions"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"services/proxy"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"create"</span>,
+                <span class="s2">"delete"</span>,
+                <span class="s2">"get"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">"kind"</span>: <span class="s2">"Service"</span>,
+            <span class="s2">"name"</span>: <span class="s2">"services/status"</span>,
+            <span class="s2">"namespaced"</span>: <span class="nb">true</span>,
+            <span class="s2">"singularName"</span>: <span class="s2">""</span>,
+            <span class="s2">"verbs"</span>: <span class="o">[</span>
+                <span class="s2">"get"</span>,
+                <span class="s2">"patch"</span>,
+                <span class="s2">"update"</span>
+            <span class="o">]</span>
+        <span class="o">}</span>
+    <span class="o">]</span>
+<span class="o">}</span>
+
+<span class="c"># 위에 정보에 보면 shortcut 정보가 정의되어 있어, 아래와 같이 endpoint를 ep로도 사용할수 있다.</span>
+ps0107@k8smaster1:~/.kube/cache/discovery/k8smaster_6443<span class="nv">$ </span>kubectl get ep
+NAME         ENDPOINTS         AGE
+kubernetes   10.146.0.2:6443   2d13h
+
+ps0107@k8smaster1:~/.kube/cache/discovery/k8smaster_6443<span class="nv">$ </span>python <span class="nt">-m</span> json.tool v1/serverresources.json | <span class="nb">grep </span>kind
+    <span class="s2">"kind"</span>: <span class="s2">"APIResourceList"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Binding"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"ComponentStatus"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"ConfigMap"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Endpoints"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Event"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"LimitRange"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Namespace"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Namespace"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Namespace"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Node"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"NodeProxyOptions"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Node"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"PersistentVolumeClaim"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"PersistentVolumeClaim"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"PersistentVolume"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"PersistentVolume"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Pod"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"PodAttachOptions"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Binding"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Eviction"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"PodExecOptions"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Pod"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"PodPortForwardOptions"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"PodProxyOptions"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Pod"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"PodTemplate"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"ReplicationController"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Scale"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"ReplicationController"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"ResourceQuota"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"ResourceQuota"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Secret"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"ServiceAccount"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Service"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"ServiceProxyOptions"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Service"</span>,
+
+ps0107@k8smaster1:~/.kube/cache/discovery/k8smaster_6443<span class="nv">$ </span>python <span class="nt">-m</span> json.tool apps/v1beta1/serverresources.json | <span class="nb">grep </span>kind
+    <span class="s2">"kind"</span>: <span class="s2">"APIResourceList"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"ControllerRevision"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Deployment"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"DeploymentRollback"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Scale"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Deployment"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"StatefulSet"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"Scale"</span>,
+            <span class="s2">"kind"</span>: <span class="s2">"StatefulSet"</span>,
+
+<span class="c"># curl로 만든 pod를 삭제 한다.</span>
+ps0107@k8smaster1:~/.kube/cache/discovery/k8smaster_6443<span class="nv">$ </span>kubectl delete po curlpod
+pod <span class="s2">"curlpod"</span> deleted
+</pre></table></code></div></div></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw mr-1"></i> <a href='/categories/kubernetes/'>Kubernetes</a>, <a href='/categories/kubernetes-administration-course/'>Kubernetes Administration Course</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw mr-1"></i> <a href="/tags/kubernetes/" class="post-tag no-text-decoration" >kubernetes</a> <a href="/tags/cka/" class="post-tag no-text-decoration" >cka</a> <a href="/tags/lfs458/" class="post-tag no-text-decoration" >LFS458</a></div><div class="post-tail-bottom d-flex justify-content-between align-items-center mt-3 pt-5 pb-2"><div class="license-wrapper"> This post is licensed under <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> by the author.</div><div class="share-wrapper"> <span class="share-label text-muted mr-1">Share</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=[kubernetes-실습] API AND ACCESS - ps's Blog&url=https://ps2046.github.io/posts/08.kubernetes_API_AND_ACCESS/" data-toggle="tooltip" data-placement="top" title="Twitter" target="_blank" rel="noopener" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=[kubernetes-실습] API AND ACCESS - ps's Blog&u=https://ps2046.github.io/posts/08.kubernetes_API_AND_ACCESS/" data-toggle="tooltip" data-placement="top" title="Facebook" target="_blank" rel="noopener" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://telegram.me/share?text=[kubernetes-실습] API AND ACCESS - ps's Blog&url=https://ps2046.github.io/posts/08.kubernetes_API_AND_ACCESS/" data-toggle="tooltip" data-placement="top" title="Telegram" target="_blank" rel="noopener" aria-label="Telegram"> <i class="fa-fw fab fa-telegram"></i> </a> <i class="fa-fw fas fa-link small" onclick="copyLink('', 'Link copied successfully!')" data-toggle="tooltip" data-placement="top" title="Copy link"> </i> </span></div></div></div></div></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted topbar-down"><div class="access"><div id="access-lastmod" class="post"> <span>Recent Update</span><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/posts/blog-comments-utterances/">[blog] github blog comments (utterances)</a><li><a href="/posts/17.kubernetes_Scheduling_2/">[kubernetes-실습] Scheduling - Taint를 이용한 pod 배포 관리</a><li><a href="/posts/18.kubernetes_logging_trubleshooting_1/">[kubernetes-실습] 로깅과 트러블슈팅 : 로그위치와 로그 출력 보기</a><li><a href="/posts/19.kubernetes_logging_trubleshooting_2/">[kubernetes-실습] 로깅과 트러블슈팅 : Metrics와 DashBoard</a><li><a href="/posts/20.kubernetes_crd/">[kubernetes-실습] CRD (Custom Resource Definition)</a></ul></div><div id="access-tags"> <span>Trending Tags</span><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/cka/">cka</a> <a class="post-tag" href="/tags/kubernetes/">kubernetes</a> <a class="post-tag" href="/tags/lfs458/">LFS458</a> <a class="post-tag" href="/tags/bash/">bash</a> <a class="post-tag" href="/tags/blog/">blog</a> <a class="post-tag" href="/tags/comments/">comments</a> <a class="post-tag" href="/tags/linux/">linux</a> <a class="post-tag" href="/tags/monitoring/">monitoring</a> <a class="post-tag" href="/tags/system/">system</a> <a class="post-tag" href="/tags/utterances/">utterances</a></div></div></div><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script><div id="toc-wrapper" class="pl-0 pr-4 mb-5"> <span class="pl-3 pt-2 mb-2">Contents</span><nav id="toc" data-toggle="toc"></nav></div></div></div><div class="row"><div class="col-12 col-lg-11 col-xl-8"><div id="post-extend-wrapper" class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><div id="related-posts" class="mt-5 mb-2 mb-sm-4"><h3 class="pt-2 mt-1 mb-4 ml-1" data-toc-skip>Further Reading</h3><div class="card-deck mb-4"><div class="card"> <a href="/posts/17.kubernetes_Scheduling_2/"><div class="card-body"> <span class="timeago small" >Jan 26<i class="unloaded">2021-01-26T08:30:00+09:00</i> </span><h3 class="pt-0 mt-1 mb-3" data-toc-skip>[kubernetes-실습] Scheduling - Taint를 이용한 pod 배포 관리</h3><div class="text-muted small"><p> Using Taints to Control Pod Deployment taints를 사용하여 어느곳에 pod가 배치되거나 실행을 허용하도록 관리할수 있다. 노드 그룹에 pod들을 할당하여 추가할때 노드 사용을 제한하거나 pod들을 완전히 대피시킬수 있다. 참고 마스터노드가 처음에 NoSchedule taint로 설정되어 있었던것을 기억할 것이다...</p></div></div></a></div><div class="card"> <a href="/posts/18.kubernetes_logging_trubleshooting_1/"><div class="card-body"> <span class="timeago small" >Jan 26<i class="unloaded">2021-01-26T09:00:00+09:00</i> </span><h3 class="pt-0 mt-1 mb-3" data-toc-skip>[kubernetes-실습] 로깅과 트러블슈팅 : 로그위치와 로그 출력 보기</h3><div class="text-muted small"><p> 로그 파일들의 위치 알아보기 다양한 로그 파일과 명령 출력 이외에도 journalctl을 사용하여 노드 관점에서 로그를 볼 수 있다. 우리는 로그 파일의 공통적인 위치를 보고, 컨테이너 로그를 보는 명령을 볼 것이다. 다른 컨테이너의 로그를 pod에 적재하는데 전용으로 사용되는 sidecar container의 사용과 같은 다른 로깅 ...</p></div></div></a></div><div class="card"> <a href="/posts/19.kubernetes_logging_trubleshooting_2/"><div class="card-body"> <span class="timeago small" >Jan 26<i class="unloaded">2021-01-26T10:00:00+09:00</i> </span><h3 class="pt-0 mt-1 mb-3" data-toc-skip>[kubernetes-실습] 로깅과 트러블슈팅 : Metrics와 DashBoard</h3><div class="text-muted small"><p> Metrics 설정 heapster가 deprecation 되면서 Metrics Server 와 통합되어 개발되고 배포되어지고 있다. 그리고 CNCF의 프로젝트중 프로메테우스도 잘 사용되어지고 있다. 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 3...</p></div></div></a></div></div></div><div class="post-navigation d-flex justify-content-between"> <a href="/posts/07.Node_maintenance/" class="btn btn-outline-primary" prompt="Older"><p>[kubernetes-실습] 기본 Node 의 maintenance (유지보수)</p></a> <a href="/posts/09.kubernetes_API/" class="btn btn-outline-primary" prompt="Newer"><p>[kubernetes-실습] API 객체</p></a></div><script src="https://utteranc.es/client.js" repo="ps2046/ps2046-github-io-comments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async> </script></div></div></div><footer class="d-flex w-100 justify-content-center"><div class="d-flex justify-content-between align-items-center"><div class="footer-left"><p class="mb-0"> © 2021 <a href="https://ps2046.github.io">ps.jang</a>. <span data-toggle="tooltip" data-placement="top" title="Except where otherwise noted, the blog posts on this site are licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) License by the author.">Some rights reserved.</span></p></div><div class="footer-right"><p class="mb-0"> Powered by <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> with <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Chirpy</a> theme.</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-sm-11 post-content"><div id="search-hints"><h4 class="text-muted mb-4">Trending Tags</h4><a class="post-tag" href="/tags/cka/">cka</a> <a class="post-tag" href="/tags/kubernetes/">kubernetes</a> <a class="post-tag" href="/tags/lfs458/">LFS458</a> <a class="post-tag" href="/tags/bash/">bash</a> <a class="post-tag" href="/tags/blog/">blog</a> <a class="post-tag" href="/tags/comments/">comments</a> <a class="post-tag" href="/tags/linux/">linux</a> <a class="post-tag" href="/tags/monitoring/">monitoring</a> <a class="post-tag" href="/tags/system/">system</a> <a class="post-tag" href="/tags/utterances/">utterances</a></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a> <script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.7.3/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="https://ps2046.github.io{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">Oops! No result founds.</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); </script> <script src="https://cdn.jsdelivr.net/combine/npm/lozad/dist/lozad.min.js,npm/magnific-popup@1/dist/jquery.magnific-popup.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/popper.js@1.16.1,npm/bootstrap@4/dist/js/bootstrap.min.js"></script> <script defer src="/app.js"></script> <script defer src="https://www.googletagmanager.com/gtag/js?id=UA-158837927-2"></script> <script> document.addEventListener("DOMContentLoaded", function(event) { window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-158837927-2'); }); </script>

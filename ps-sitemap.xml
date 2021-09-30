@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
+        xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/blog-comments-utterances/.html</loc>
+        
+        <lastmod>2021-09-22T00:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/00.linux_system_analysis/.html</loc>
+        
+        <lastmod>2021-02-20T00:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/24.kubernetes_HA/.html</loc>
+        
+        <lastmod>2021-01-26T15:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/23.kubernetes_Security_Authentication_Authorization_Admission/.html</loc>
+        
+        <lastmod>2021-01-26T14:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/22.kubernetes_Security_TLS/.html</loc>
+        
+        <lastmod>2021-01-26T13:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/21.kubernetes_helm/.html</loc>
+        
+        <lastmod>2021-01-26T12:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/20.kubernetes_crd/.html</loc>
+        
+        <lastmod>2021-01-26T11:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/19.kubernetes_logging_trubleshooting_2/.html</loc>
+        
+        <lastmod>2021-01-26T10:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/18.kubernetes_logging_trubleshooting_1/.html</loc>
+        
+        <lastmod>2021-01-26T09:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/17.kubernetes_Scheduling_2/.html</loc>
+        
+        <lastmod>2021-01-26T08:30:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/16.kubernetes_Scheduling_1/.html</loc>
+        
+        <lastmod>2021-01-26T08:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/15.kubernetes_ingress/.html</loc>
+        
+        <lastmod>2021-01-26T07:30:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/14.kubernetes_ResourceQuota/.html</loc>
+        
+        <lastmod>2021-01-26T07:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/13.kubernetes_PV_PVC/.html</loc>
+        
+        <lastmod>2021-01-26T06:30:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/12.kubernetes_Volumes_and_Data_ConfigMap/.html</loc>
+        
+        <lastmod>2021-01-26T06:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/11.kubernetes_Service_Resource/.html</loc>
+        
+        <lastmod>2021-01-26T05:40:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/10.Managing_State_with_Deployments/.html</loc>
+        
+        <lastmod>2021-01-26T05:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/09.kubernetes_API/.html</loc>
+        
+        <lastmod>2021-01-26T04:30:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/08.kubernetes_API_AND_ACCESS/.html</loc>
+        
+        <lastmod>2021-01-26T04:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/07.Node_maintenance/.html</loc>
+        
+        <lastmod>2021-01-26T03:30:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/06.advance_deployment/.html</loc>
+        
+        <lastmod>2021-01-26T03:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/05.kubernetes_namespace_resource_limit/.html</loc>
+        
+        <lastmod>2021-01-26T02:30:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/04.kubernetes_deployment_CPU_Memory/.html</loc>
+        
+        <lastmod>2021-01-26T02:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/03.deployment_yaml_service/.html</loc>
+        
+        <lastmod>2021-01-26T01:30:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/02.kubernetes_cluster_node_setting/.html</loc>
+        
+        <lastmod>2021-01-26T01:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/01.kubeadm_install_setting/.html</loc>
+        
+        <lastmod>2021-01-26T00:30:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+    <url>
+        <loc>https://ps2046.github.io/posts/00.kubernetes_cka/.html</loc>
+        
+        <lastmod>2021-01-26T00:00:00+09:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.5</priority>
+        
+
+    </url>
+    
+</urlset>
